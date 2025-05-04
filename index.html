@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator Lirik Lagu</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #result {
+            margin-top: 20px;
+            white-space: pre-line;
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 4px solid #4CAF50;
+        }
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Generator Lirik Lagu</h1>
+    <div class="container">
+        <div class="form-group">
+            <label for="tema">Tema Lagu:</label>
+            <input type="text" id="tema" placeholder="Contoh: Cinta, Persahabatan, Motivasi, dll">
+        </div>
+        
+        <div class="form-group">
+            <label for="genre">Genre Musik:</label>
+            <select id="genre">
+                <option value="pop">Pop</option>
+                <option value="rock">Rock</option>
+                <option value="ballad">Ballad</option>
+                <option value="hiphop">Hip Hop</option>
+                <option value="rnb">R&B</option>
+                <option value="folk">Folk</option>
+                <option value="dangdut">Dangdut</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="mood">Mood Lagu:</label>
+            <select id="mood">
+                <option value="bahagia">Bahagia</option>
+                <option value="sedih">Sedih</option>
+                <option value="romantis">Romantis</option>
+                <option value="penuh-semangat">Penuh Semangat</option>
+                <option value="nostalgic">Nostalgia</option>
+                <option value="penuh-harapan">Penuh Harapan</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="struktur">Struktur Lagu:</label>
+            <select id="struktur">
+                <option value="simple">Sederhana (Verse - Chorus - Verse - Chorus)</option>
+                <option value="complex">Kompleks (Intro - Verse - Pre-Chorus - Chorus - Verse - Chorus - Bridge - Chorus)</option>
+                <option value="ballad">Ballad (Verse - Verse - Chorus - Verse - Chorus - Outro)</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="keywords">Kata Kunci (pisahkan dengan koma):</label>
+            <input type="text" id="keywords" placeholder="Contoh: hujan, kenangan, janji, dll">
+        </div>
+        
+        <button onclick="generateLyrics()">Buat Lirik Lagu</button>
+        
+        <div id="result" style="display: none;"></div>
+        
+        <div class="controls" style="display: none;" id="exportControls">
+            <button onclick="copyToClipboard()">Salin Lirik</button>
+            <button onclick="downloadLyrics()">Unduh Lirik</button>
+        </div>
+    </div>
+
+    <script>
+        // Template lirik berdasarkan genre dan mood
+        const templates = {
+            pop: {
+                bahagia: {
+                    verse: [
+                        "Mentari bersinar di atas %KEYWORD1%\nSenyummu bagai %KEYWORD2% yang mencerahkan hari\nTak perlu %KEYWORD3% untuk bahagia\nSaat %TEMA% menjadi alasanku tersenyum",
+                        "Langkahku ringan bersama %KEYWORD1%\nTak ada yang menghalangi %TEMA% kita\n%KEYWORD2% menjadi saksi kebahagiaan\nSaat %KEYWORD3% memenuhi udara di sekitar"
+                    ],
+                    chorus: [
+                        "Oh %TEMA% ini seperti %KEYWORD1%\nMembuat hati berdebar riang\n%KEYWORD2% tak bisa mengalahkan rasa ini\nSaat %KEYWORD3% membawa kita terbang tinggi",
+                        "Biarkan %TEMA% membawamu pergi\n%KEYWORD1% takkan pernah pudar\nSepanjang %KEYWORD2% menjadi saksi\nKita berdua dan %KEYWORD3% selamanya"
+                    ],
+                    bridge: [
+                        "Tak perlu menunggu %KEYWORD1%\nUntuk merasakan %TEMA% yang sejati\n%KEYWORD2% hanyalah permulaan\nDari %KEYWORD3% yang akan kita lalui",
+                        "%KEYWORD1% bukanlah akhir cerita\n%TEMA% masih panjang untuk dilalui\nSepanjang %KEYWORD2% masih ada\n%KEYWORD3% akan terus bersemi"
+                    ]
+                },
+                sedih: {
+                    verse: [
+                        "Di balik %KEYWORD1% kusimpan luka\n%KEYWORD2% tak lagi sama seperti dulu\n%TEMA% yang kini menghilang\nMeninggalkan %KEYWORD3% yang berdebu",
+                        "Hujan turun bersama %KEYWORD1%\nMengingat %TEMA% yang telah pergi\n%KEYWORD2% kini hanya kenangan\nBersama %KEYWORD3% yang tak kembali"
+                    ],
+                    chorus: [
+                        "Mengapa %TEMA% harus berakhir?\n%KEYWORD1% masih terasa di hati\nAir mata jatuh di %KEYWORD2%\nTak bisa kembali seperti %KEYWORD3%",
+                        "%TEMA% telah meninggalkanku sendiri\nDi tengah %KEYWORD1% yang sunyi\nTak ada lagi %KEYWORD2% untukku\nHanya %KEYWORD3% yang tersisa"
+                    ],
+                    bridge: [
+                        "Bisakah waktu kembali ke %KEYWORD1%?\nSaat %TEMA% masih bersemi\n%KEYWORD2% masih terasa hangat\nSebelum %KEYWORD3% menghilang",
+                        "Kugenggam erat %KEYWORD1% yang tersisa\n%TEMA% mungkin takkan kembali\nTapi %KEYWORD2% akan selalu ada\nMeski %KEYWORD3% telah pergi"
+                    ]
+                },
+                // Template lain bisa ditambahkan sesuai kebutuhan
+            },
+            rock: {
+                penuh_semangat: {
+                    verse: [
+                        "%KEYWORD1% berteriak dalam gelap\nJiwaku memberontak untuk %TEMA%\n%KEYWORD2% tak bisa membendung\nApi %KEYWORD3% yang membara",
+                        "Di tengah %KEYWORD1% yang menggila\n%TEMA% menjadi sumber kekuatan\n%KEYWORD2% takkan pernah mematahkan\nSemangat %KEYWORD3% dalam diri"
+                    ],
+                    chorus: [
+                        "Yeah! %TEMA% adalah segalanya!\nBiar %KEYWORD1% menjadi saksi\nKita taklukkan %KEYWORD2% bersama\nDengan %KEYWORD3% yang tak pernah mati!",
+                        "Teriakkan %TEMA% sekeras mungkin!\n%KEYWORD1% tak bisa menghentikan\nGelombang %KEYWORD2% dalam dada\nBersama %KEYWORD3% kita menggebu!"
+                    ],
+                    bridge: [
+                        "Tak ada yang bisa menghentikan %KEYWORD1%\nSaat %TEMA% menjadi tujuan\n%KEYWORD2% mungkin menghalangi\nTapi %KEYWORD3% lebih kuat dari segalanya",
+                        "Hancurkan %KEYWORD1% yang menghalangi\n%TEMA% adalah hakmu sejati\nBiar %KEYWORD2% menjadi saksi\nKekuatan %KEYWORD3% dalam diri"
+                    ]
+                }
+                // Template lain bisa ditambahkan
+            },
+            // Genre lain bisa ditambahkan
+        };
+
+        // Template default jika tidak ada template spesifik
+        const defaultTemplates = {
+            verse: [
+                "Hari ini aku memikirkan tentang %TEMA%\n%KEYWORD1% mengingatkanku pada masa lalu\n%KEYWORD2% berbisik lembut di telinga\nSementara %KEYWORD3% menuntun langkahku",
+                "Di antara %KEYWORD1% yang bergerak perlahan\n%TEMA% menjadi penuntun hidupku\n%KEYWORD2% tak pernah mengkhianati\nSaat %KEYWORD3% mulai mengaburkan pandangan"
+            ],
+            chorus: [
+                "Oh %TEMA%... mengapa begitu indah?\n%KEYWORD1% tak mampu menggambarkannya\nBersama %KEYWORD2% kita lalui semua\nSampai %KEYWORD3% menyambut di ujung jalan",
+                "%TEMA% adalah jawaban dari segalanya\nSeperti %KEYWORD1% yang tak pernah pudar\n%KEYWORD2% menjadi saksi bisu\nSaat %KEYWORD3% membawa kita bersama"
+            ],
+            bridge: [
+                "Andai %KEYWORD1% bisa berbicara\nTentang %TEMA% yang kita rasakan\n%KEYWORD2% mungkin akan mengerti\nBahwa %KEYWORD3% adalah kunci dari segalanya",
+                "Bukan %KEYWORD1% yang kucari\nTapi %TEMA% yang sesungguhnya\n%KEYWORD2% hanyalah permulaan\nDari %KEYWORD3% yang akan datang"
+            ]
+        };
+
+        function getRandomTemplate(templates) {
+            return templates[Math.floor(Math.random() * templates.length)];
+        }
+
+        function generateLyrics() {
+            const tema = document.getElementById('tema').value || 'Kehidupan';
+            const genre = document.getElementById('genre').value;
+            const mood = document.getElementById('mood').value;
+            const struktur = document.getElementById('struktur').value;
+            let keywords = document.getElementById('keywords').value.split(',').map(k => k.trim());
+            
+            // Jika keywords kurang dari 3, tambahkan default keywords
+            while (keywords.length < 3) {
+                keywords.push(['cinta', 'waktu', 'harapan', 'mimpi', 'hati', 'bintang'][Math.floor(Math.random() * 6)]);
+            }
+            
+            // Pilih template berdasarkan genre dan mood
+            let templateToUse = templates[genre] && templates[genre][mood] ? 
+                              templates[genre][mood] : defaultTemplates;
+            
+            let lyrics = '';
+            
+            // Struktur lagu berdasarkan pilihan
+            if (struktur === 'simple') {
+                // Verse 1
+                lyrics += "[ Verse 1 ]\n";
+                lyrics += replacePlaceholders(getRandomTemplate(templateToUse.verse), tema, keywords);
+                lyrics += "\n\n";
+                
+                // Chorus
+                lyrics += "[ Chorus ]\n";
+                lyrics += replacePlaceholders(getRandomTemplate(templateToUse.chorus), tema, keywords);
+                lyrics += "\n\n";
+                
+                // Verse 2
+                lyrics += "[ Verse 2 ]\n";
+                lyrics += replacePlaceholders(getRandomTemplate(templateToUse.verse), tema, keywords);
+                lyrics += "\n\n";
+                
+                // Chorus (repeat)
+                lyrics += "[ Chorus ]\n";
+                lyrics += replacePlaceholders(getRandomTemplate(templateToUse.chorus), tema, keywords);
+            } 
+            else if (struktur === 'complex') {
+                // Intro
+                lyrics += "[ Intro ]\n";
+                lyrics += "(Instrumental)\n\n";
+                
+                // Verse 1
+                lyrics += "[ Verse 1 ]\n";
+                lyrics += replacePlaceholders(getRandomTemplate(templateToUse.verse), tema, keywords);
+                lyrics += "\n\n";
+                
+                // Pre-Chorus
+                lyrics += "[ Pre-Chorus ]\n";
+                lyrics += generatePreChorus(tema, keywords);
+                lyrics += "\n\n";
+                
+                // Chorus
+                lyrics += "[ Chorus ]\n";
+                lyrics += replacePlaceholders(getRandomTemplate(templateToUse.chorus), tema, keywords);
+                lyrics += "\n\n";
+                
+                // Verse 2
+                lyrics += "[ Verse 2 ]\n";
+                lyrics += replacePlaceholders(getRandomTemplate(templateToUse.verse), tema, keywords);
+                lyrics += "\n\n";
+                
+                // Chorus (repeat)
+                lyrics += "[ Chorus ]\n";
+                lyrics += replacePlaceholders(getRandomTemplate(templateToUse.chorus), tema, keywords);
+                lyrics += "\n\n";
+                
+                // Bridge
+                lyrics += "[ Bridge ]\n";
+                lyrics += replacePlaceholders(getRandomTemplate(templateToUse.bridge || defaultTemplates.bridge), tema, keywords);
+                lyrics += "\n\n";
+                
+                // Chorus (final)
+                lyrics += "[ Chorus (Final) ]\n";
+                lyrics += replacePlaceholders(getRandomTemplate(templateToUse.chorus), tema, keywords);
+            }
+            else if (struktur === 'ballad') {
+                // Verse 1
+                lyrics += "[ Verse 1 ]\n";
+                lyrics += replacePlaceholders(getRandomTemplate(templateToUse.verse), tema, keywords);
+                lyrics += "\n\n";
+                
+                // Verse 2
+                lyrics += "[ Verse 2 ]\n";
+                lyrics += replacePlaceholders(getRandomTemplate(templateToUse.verse), tema, keywords);
+                lyrics += "\n\n";
+                
+                // Chorus
+                lyrics += "[ Chorus ]\n";
+                lyrics += replacePlaceholders(getRandomTemplate(templateToUse.chorus), tema, keywords);
+                lyrics += "\n\n";
+                
+                // Verse 3
+                lyrics += "[ Verse 3 ]\n";
+                lyrics += replacePlaceholders(getRandomTemplate(templateToUse.verse), tema, keywords);
+                lyrics += "\n\n";
+                
+                // Chorus (repeat)
+                lyrics += "[ Chorus ]\n";
+                lyrics += replacePlaceholders(getRandomTemplate(templateToUse.chorus), tema, keywords);
+                lyrics += "\n\n";
+                
+                // Outro
+                lyrics += "[ Outro ]\n";
+                lyrics += generateOutro(tema, keywords);
+            }
+            
+            // Menampilkan hasil
+            document.getElementById('result').textContent = lyrics;
+            document.getElementById('result').style.display = 'block';
+            document.getElementById('exportControls').style.display = 'flex';
+        }
+        
+        function replacePlaceholders(template, tema, keywords) {
+            let result = template;
+            result = result.replace(/%TEMA%/g, tema);
+            result = result.replace(/%KEYWORD1%/g, keywords[0]);
+            result = result.replace(/%KEYWORD2%/g, keywords[1]);
+            result = result.replace(/%KEYWORD3%/g, keywords[2]);
+            return result;
+        }
+        
+        function generatePreChorus(tema, keywords) {
+            const preChorusTemplates = [
+                `Dan sekarang ${keywords[0]} mulai terasa\n${tema} semakin dekat di depan mata\n${keywords[1]} tak mampu menahan\nSaat ${keywords[2]} mulai menggema`,
+                `Menuju ${keywords[0]} yang tak terbatas\n${tema} adalah tujuan kita bersama\n${keywords[1]} menjadi saksi perjalanan\nDan ${keywords[2]} akan selalu ada`
+            ];
+            
+            return preChorusTemplates[Math.floor(Math.random() * preChorusTemplates.length)];
+        }
+        
+        function generateOutro(tema, keywords) {
+            const outroTemplates = [
+                `${keywords[0]} perlahan memudar\n${tema} akan selalu dikenang\n${keywords[1]} menjadi saksi abadi\nSaat ${keywords[2]} mengantar perpisahan`,
+                `Terima kasih untuk ${keywords[0]}\n${tema} akan selalu di hati\n${keywords[1]} takkan pernah terlupakan\nMeski ${keywords[2]} harus berakhir`
+            ];
+            
+            return outroTemplates[Math.floor(Math.random() * outroTemplates.length)];
+        }
+        
+        function copyToClipboard() {
+            const text = document.getElementById('result').textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Lirik berhasil disalin!');
+            });
+        }
+        
+        function downloadLyrics() {
+            const text = document.getElementById('result').textContent;
+            const tema = document.getElementById('tema').value || 'Untitled';
+            const filename = `Lirik - ${tema}.txt`;
+            
+            const element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+            element.setAttribute('download', filename);
+            
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            
+            element.click();
+            
+            document.body.removeChild(element);
+        }
+    </script>
+</body>
+</html>
